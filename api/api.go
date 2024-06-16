@@ -1,10 +1,9 @@
-package news
+package api
 
 import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"time"
 )
 
 type Post struct {
@@ -15,19 +14,26 @@ type Post struct {
 	Score int
 }
 
-func GetTopPostÍds() (IDs *[]int, err error) {
-	url := "https://hacker-news.firebaseio.com/v0/topstories.json"
+const (
+	GetPostsUrl    = "https://hacker-news.firebaseio.com/v0/topstories.json"
+	GetPostByIDUrl = "https://hacker-news.firebaseio.com/v0/item/%s.json"
+)
 
-	client := http.Client{
-		Timeout: time.Second * 2,
-	}
+type Api struct {
+	client *http.Client
+}
 
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+func New(c *http.Client) *Api {
+	return &Api{client: c}
+}
+
+func (a *Api) GetTopPostÍds() (*[]int, error) {
+	req, err := http.NewRequest(http.MethodGet, GetPostsUrl, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := client.Do(req)
+	res, err := a.client.Do(req)
 	if err != nil {
 		return nil, err
 	}
