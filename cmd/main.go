@@ -20,5 +20,10 @@ func main() {
 		fmt.Println(err)
 	}
 
-	fmt.Println(ids)
+	post, err := api.GetPostByID((*ids)[1])
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(post.Title, post.URL)
 }
