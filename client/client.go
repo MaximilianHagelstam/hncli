@@ -1,4 +1,4 @@
-package api
+package client
 
 import (
 	"encoding/json"
@@ -16,25 +16,25 @@ type Post struct {
 }
 
 const (
-	GetPostsUrl    = "https://hacker-news.firebaseio.com/v0/topstories.json"
+	GetPostIDsUrl  = "https://hacker-news.firebaseio.com/v0/topstories.json"
 	GetPostByIDUrl = "https://hacker-news.firebaseio.com/v0/item/%d.json"
 )
 
-type Api struct {
+type Client struct {
 	client *http.Client
 }
 
-func New(c *http.Client) *Api {
-	return &Api{client: c}
+func New(c *http.Client) *Client {
+	return &Client{client: c}
 }
 
-func (a *Api) GetTopPostÍds() (*[]int, error) {
-	req, err := http.NewRequest(http.MethodGet, GetPostsUrl, nil)
+func (c *Client) GetTopPostÍDs() (*[]int, error) {
+	req, err := http.NewRequest(http.MethodGet, GetPostIDsUrl, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := a.client.Do(req)
+	res, err := c.client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -48,21 +48,21 @@ func (a *Api) GetTopPostÍds() (*[]int, error) {
 		return nil, err
 	}
 
-	postIds := []int{}
-	if err := json.Unmarshal(body, &postIds); err != nil {
+	postIDs := []int{}
+	if err := json.Unmarshal(body, &postIDs); err != nil {
 		return nil, err
 	}
 
-	return &postIds, nil
+	return &postIDs, nil
 }
 
-func (a *Api) GetPostByID(ID int) (*Post, error) {
+func (c *Client) GetPostByID(ID int) (*Post, error) {
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf(GetPostByIDUrl, ID), nil)
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := a.client.Do(req)
+	res, err := c.client.Do(req)
 	if err != nil {
 		return nil, err
 	}

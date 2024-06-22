@@ -5,25 +5,28 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/MaximilianHagelstam/hncli/api"
+	"github.com/MaximilianHagelstam/hncli/client"
 )
 
 func main() {
-	client := http.Client{
-		Timeout: time.Second * 2,
-	}
+	postClient := client.New(&http.Client{Timeout: time.Second * 2})
 
-	api := api.New(&client)
-
-	ids, err := api.GetTopPostÍds()
+	ids, err := postClient.GetTopPostÍDs()
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	post, err := api.GetPostByID((*ids)[1])
-	if err != nil {
-		fmt.Println(err)
+	posts := []client.Post{}
+	topTenIDs := (*ids)[:10]
+
+	for _, id := range topTenIDs {
+		post, err := postClient.GetPostByID(id)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		posts = append(posts, *post)
 	}
 
-	fmt.Println(post.Title, post.URL)
+	fmt.Printf("%+v\n", posts)
 }
