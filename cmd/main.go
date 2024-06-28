@@ -8,6 +8,8 @@ import (
 	"github.com/MaximilianHagelstam/hncli/client"
 )
 
+const PageLength = 10
+
 func main() {
 	postClient := client.New(&http.Client{Timeout: time.Second * 2})
 
@@ -16,16 +18,19 @@ func main() {
 		fmt.Println(err)
 	}
 
+	topIDs := (*ids)[:PageLength]
+	c := make(chan client.Post, len(topIDs))
+
+	for _, id := range topIDs {
+		go func() {
+			post, _ := postClient.GetPostByID(id)
+			c <- *post
+		}()
+	}
+
 	posts := []client.Post{}
-	topTenIDs := (*ids)[:10]
-
-	for _, id := range topTenIDs {
-		post, err := postClient.GetPostByID(id)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		posts = append(posts, *post)
+	for range topIDs {
+		posts = append(posts, <-c)
 	}
 
 	fmt.Printf("%+v\n", posts)
